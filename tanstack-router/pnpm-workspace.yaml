@@ -1,4 +1,4 @@
 allowBuilds:
-  lightningcss: set this to true or false
+  lightningcss: true
 minimumReleaseAgeExclude:
-  - '@grabreu/aduana@1.0.1'
+  - "@grabreu/aduana@1.0.1"

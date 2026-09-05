@@ -9,50 +9,114 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppStarredIndexRouteImport } from './routes/_app/starred/index'
+import { Route as AppListTodoListIdIndexRouteImport } from './routes/_app/list/$todoListId/index'
 
-const IndexRoute = IndexRouteImport.update({
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
+} as any)
+const AppStarredIndexRoute = AppStarredIndexRouteImport.update({
+  id: '/starred/',
+  path: '/starred/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppListTodoListIdIndexRoute = AppListTodoListIdIndexRouteImport.update({
+  id: '/list/$todoListId/',
+  path: '/list/$todoListId/',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/starred/': typeof AppStarredIndexRoute
+  '/list/$todoListId/': typeof AppListTodoListIdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/starred': typeof AppStarredIndexRoute
+  '/list/$todoListId': typeof AppListTodoListIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_app/': typeof AppIndexRoute
+  '/_app/starred/': typeof AppStarredIndexRoute
+  '/_app/list/$todoListId/': typeof AppListTodoListIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/starred/' | '/list/$todoListId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/starred' | '/list/$todoListId'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_app/'
+    | '/_app/starred/'
+    | '/_app/list/$todoListId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/starred/': {
+      id: '/_app/starred/'
+      path: '/starred'
+      fullPath: '/starred/'
+      preLoaderRoute: typeof AppStarredIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/list/$todoListId/': {
+      id: '/_app/list/$todoListId/'
+      path: '/list/$todoListId'
+      fullPath: '/list/$todoListId/'
+      preLoaderRoute: typeof AppListTodoListIdIndexRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+  AppStarredIndexRoute: typeof AppStarredIndexRoute
+  AppListTodoListIdIndexRoute: typeof AppListTodoListIdIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+  AppStarredIndexRoute: AppStarredIndexRoute,
+  AppListTodoListIdIndexRoute: AppListTodoListIdIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
